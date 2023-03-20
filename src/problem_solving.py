@@ -62,6 +62,7 @@ cat_imputer = SimpleImputer(
     strategy="most_frequent").set_output(transform="pandas")
 
 # Scaler & Encoder
+cat_ = 'auto'
 if len(cat_cols) > 0:
     df_imputed_stacked_cat = cat_imputer.fit_transform(
         df
@@ -70,50 +71,47 @@ if len(cat_cols) > 0:
         [cat_cols])
     cat_ = OneHotEncoder(sparse=False, drop="first").fit(
         df_imputed_stacked_cat).categories_
-else:
-    cat_ = 'auto'
 
-encoder = OneHotEncoder(categories=cat_, sparse=False, drop="first")
+encoder = OneHotEncoder(categories=cat_, sparse=False,
+                        drop="first").set_output(transform="pandas")
 scaler = StandardScaler().set_output(transform="pandas")
 
+X_train_cat, X_train_num = None, None
 
-# feature pipelines
-num_pipe = Pipeline(steps=[("num_imputer", num_imputer), ("scaler", scaler)])
-cat_pipe = Pipeline(steps=[("cat_imputer", cat_imputer), ("encoder", encoder)])
+if len(cat_cols) > 0:
+    X_train_cat = encoder.fit_transform(
+        cat_imputer.fit_transform(X_train[cat_cols]))
 
-# end2end features preprocessor
+if len(num_cols) > 0:
+    X_train_num = scaler.fit_transform(
+        num_imputer.fit_transform(X_train[num_cols]))
 
-transformers = []
+X_train_ok = pd.concat([X_train_num, X_train_cat], axis=1)
 
-transformers.append(("numerical", num_pipe, num_cols)) if len(
-    num_cols) > 0 else None
-transformers.append(("categorical", cat_pipe, cat_cols,)) if len(
-    cat_cols) > 0 else None
-#  ("date", date_pipe, date_cols,),
-
-preprocessor = ColumnTransformer(
-    transformers=transformers).set_output(transform="pandas")
-
-print(
-    f"\n[Info] Features Transformer : {transformers}. \n")
-
-
-# end2end pipeline
-end2end_pipeline = Pipeline([
-    ('preprocessor', preprocessor),
-    ('model', RandomForestClassifier(random_state=10))
-]).set_output(transform="pandas")
+model = RandomForestClassifier(random_state=10)
 
 # Training
 print(
     f"\n[Info] Training.\n[Info] X_train : columns( {X_train.columns.tolist()}), shape: {X_train.shape} .\n")
 
-end2end_pipeline.fit(X_train, y_train)
+model.fit(X_train_ok, y_train)
 
 # Evaluation
 print(
     f"\n[Info] Evaluation.\n")
-y_eval_pred = end2end_pipeline.predict(X_eval)
+X_eval_cat, X_eval_num = None, None
+
+if len(cat_cols) > 0:
+    X_eval_cat = encoder.transform(
+        cat_imputer.transform(X_eval[cat_cols]))
+
+if len(num_cols) > 0:
+    X_eval_num = scaler.transform(
+        num_imputer.transform(X_eval[num_cols]))
+
+X_eval_ok = pd.concat([X_eval_num, X_eval_cat], axis=1)
+
+y_eval_pred = model.predict(X_eval_ok)
 
 print(classification_report(y_eval, y_eval_pred,
       target_names=iris['target_names']))
@@ -126,7 +124,11 @@ print(
     f"\n[Info] Exportation.\n")
 to_export = {
     "labels": iris['target_names'],
-    "pipeline": end2end_pipeline,
+    "num_imputer": num_imputer,
+    "cat_imputer": cat_imputer,
+    "scaler": scaler,
+    "encoder": encoder,
+    "model": model,
 }
 
 
