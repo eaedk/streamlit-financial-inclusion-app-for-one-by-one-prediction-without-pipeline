@@ -99,15 +99,12 @@ model.fit(X_train_ok, y_train)
 # Evaluation
 print(
     f"\n[Info] Evaluation.\n")
-X_eval_cat, X_eval_num = None, None
 
-if len(cat_cols) > 0:
-    X_eval_cat = encoder.transform(
-        cat_imputer.transform(X_eval[cat_cols]))
+X_eval_cat = encoder.transform(
+    cat_imputer.transform(X_eval[cat_cols])) if len(cat_cols) > 0 else None
 
-if len(num_cols) > 0:
-    X_eval_num = scaler.transform(
-        num_imputer.transform(X_eval[num_cols]))
+X_eval_num = scaler.transform(
+    num_imputer.transform(X_eval[num_cols]))if len(num_cols) > 0 else None
 
 X_eval_ok = pd.concat([X_eval_num, X_eval_cat], axis=1)
 
