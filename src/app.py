@@ -96,7 +96,8 @@ with form:
          "sepal length (cm)": [cols[0].slider("What's the sepal length? :", 0.0, 10.0, 1.0)],
          "sepal width (cm)": [cols[1].slider("What's the sepal width? :", 0.0, 10.0, 1.0)], }
     )
-    print(f"\n[Info] Input information as dataframe: \n{df_input.to_string()}")
+    print(
+        f"\n[Info] Input information as dataframe: \n{df_input.to_markdown()}\n")
 
     submitted = st.form_submit_button(label="Submit")
 
@@ -112,7 +113,16 @@ with form:
             # df_input['pred_label'] = df_input['pred_label'].replace(
             #     idx_to_labels)
             # Prediction of just the labels and confident scores...!
-            prediction_output = end2end_pipeline.predict_proba(df_input)
+
+            X_cat = encoder.transform(cat_imputer.transform(
+                df_input[cat_cols])) if len(cat_cols) > 0 else None
+
+            X_num = scaler.transform(num_imputer.transform(
+                df_input[num_cols])) if len(num_cols) > 0 else None
+
+            X = pd.concat([X_num, X_cat], axis=1)
+
+            prediction_output = model.predict_proba(X)
             print(
                 f"[Info] Prediction output (of type '{type(prediction_output)}') from passed input: {prediction_output} of shape {prediction_output.shape}")
             predicted_idx = prediction_output.argmax(axis=-1)
