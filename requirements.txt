@@ -2,6 +2,7 @@ streamlit
 watchdog
 pandas
 pytest
+tabulate
 # ML DEV
 scikit-learn
 pandas_profiling
