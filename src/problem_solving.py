@@ -124,6 +124,8 @@ print(
     f"\n[Info] Exportation.\n")
 to_export = {
     "labels": iris['target_names'],
+    "num_cols": num_cols,
+    "cat_cols": cat_cols,
     "num_imputer": num_imputer,
     "cat_imputer": cat_imputer,
     "scaler": scaler,
