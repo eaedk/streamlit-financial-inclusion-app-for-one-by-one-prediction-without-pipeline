@@ -50,6 +50,11 @@ def setup(fp):
 # Setup execution
 ml_components_dict = load_ml_components(fp=ml_core_fp)
 labels = ml_components_dict['labels']
+num_imputer = ml_components_dict['num_imputer']
+cat_imputer = ml_components_dict['cat_imputer']
+scaler = ml_components_dict['scaler']
+encoder = ml_components_dict['encoder']
+model = ml_components_dict['model']
 end2end_pipeline = ml_components_dict['pipeline']
 print(f"\n[Info] ML components loaded: {list(ml_components_dict.keys())}")
 print(f"\n[Info] Predictable labels: {labels}")
