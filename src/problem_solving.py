@@ -46,6 +46,8 @@ target_col = 'bank_account'
 # 1 indicates that the individual does have a bank account and 0 indicates that they do not.
 target_names = ["no_account", "has_account"]
 
+print("\n", df.info(), "\n",)
+print("\n", df.describe(), "\n",)
 
 # pandas profiling
 profile = ProfileReport(df, title="Dataset", html={
