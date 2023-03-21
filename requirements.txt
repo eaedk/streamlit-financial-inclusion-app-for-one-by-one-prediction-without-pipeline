@@ -3,6 +3,7 @@ watchdog
 pandas
 pytest
 tabulate
+gdown
 # ML DEV
 scikit-learn
 pandas_profiling
