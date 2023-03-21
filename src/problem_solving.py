@@ -65,7 +65,7 @@ num_cols = list(set(df.select_dtypes('number')) - set(to_ignore_cols))
 cat_cols = list(set(df.select_dtypes(exclude='number')) - set(to_ignore_cols))
 print(f"\n[Info] The '{len(num_cols)}' numeric columns are : {num_cols}\nThe '{len(cat_cols)}' categorical columns are : {cat_cols}")
 
-X, y = df.drop(columns=target_col), df[target_col].values
+X, y = df[num_cols+cat_cols], df[target_col].values
 
 
 X_train, X_eval, y_train, y_eval = train_test_split(
@@ -161,3 +161,5 @@ with open(ml_fp, 'wb') as file:
 # Requirements
 # ! pip freeze > requirements.txt
 call(f"pip freeze > {req_fp}", shell=True)
+
+print(f"[Info] Dictionary to use to as base for dataframe filling :\n",{col: [] for col in X_train.columns})
