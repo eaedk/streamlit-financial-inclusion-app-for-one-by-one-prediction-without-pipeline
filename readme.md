@@ -1,6 +1,8 @@
-# 🚀 Streamlit Iris App 🚀
+# 🚀 Streamlit Financial Inclusion App 🚀
 
-There are many ways to make web interfaces to allow interaction with Machine Learning models and we will cover two of them.
+There are many ways to make web interfaces to allow interaction with Machine Learning models and this on has been done using Streamlit.
+
+[Discover the dataset here](https://zindi.africa/competitions/financial-inclusion-in-africa)
 
 [![python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 [![MIT licensed](https://img.shields.io/badge/license-mit-blue?style=for-the-badge&logo=appveyor)](./LICENSE)
@@ -75,7 +77,7 @@ You need [`Python3`](https://www.python.org/) on your system to setup this app. 
         <th> Streamlit App </th>
     </tr>
     <tr>
-        <td><img src="./screenshots/img001.jpeg"/></td>
+        <td><img src="./screenshots/img001.png"/></td>
     </tr>
 </table>
 
