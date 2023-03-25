@@ -6,15 +6,15 @@ import pickle
 
 # PAGE CONFIG : Must be the first line after the importation section
 st.set_page_config(
-    page_title="[Demo] Iris Classification App", page_icon="💐", layout="centered")
+    page_title="Financial Inclusion App", page_icon="🏦", layout="centered")
 
 # Setup variables and constants
 DIRPATH = os.path.dirname(os.path.realpath(__file__))
 tmp_df_fp = os.path.join(DIRPATH, "assets", "tmp", "history.csv")
 ml_core_fp = os.path.join(DIRPATH, "assets", "ml", "ml_components.pkl")
 init_df = pd.DataFrame(
-    {"petal length (cm)": [], "petal width (cm)": [],
-     "sepal length (cm)": [], "sepal width (cm)": [], }
+    {'household_size': [], 'year': [], 'age_of_respondent': [], 'job_type': [], 'location_type': [], 'gender_of_respondent': [
+    ], 'relationship_with_head': [], 'education_level': [], 'marital_status': [], 'cellphone_access': [], 'country': []}
 )
 
 # FUNCTIONS
@@ -57,6 +57,8 @@ num_imputer = ml_components_dict['num_imputer']
 cat_imputer = ml_components_dict['cat_imputer']
 scaler = ml_components_dict['scaler']
 encoder = ml_components_dict['encoder']
+col_to_opts = {c: opts for (c, opts) in zip(cat_cols, encoder.categories_)}
+print(f"Avalaible options for each categorical variable : {col_to_opts}")
 model = ml_components_dict['model']
 
 print(f"\n[Info] ML components loaded: {list(ml_components_dict.keys())}")
@@ -71,15 +73,14 @@ except:
 
 # APP Interface
 st.image(
-    "https://www.thespruce.com/thmb/GXt55Sf9RIzADYAG5zue1hXtlqc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/iris-flowers-plant-profile-5120188-01-04a464ab8523426fab852b55d3bb04f0.jpg",
+    "https://zindi-public-release.s3.eu-west-2.amazonaws.com/uploads/competition/image/19/header_df9adbda-2360-406d-9dc2-2342c054c795.png",
 )
+# style = "background-image: url("https: // zindi-public-release.s3.eu-west-2.amazonaws.com/uploads/competition/image/19/header_df9adbda-2360-406d-9dc2-2342c054c795.png"), url("");"
 # Title
-st.title("💐 [Demo] Iris Classification App")
+st.title("🏦 Financial Inclusion App")
 
-# Sidebar
-st.sidebar.write(f"Description")
-st.sidebar.write(
-    f"This app shows a simple demo of a Streamlit app for Iris flowers classification.")
+st.write(
+    f"This app shows a simple demo of a Streamlit app for. Financial inclusion remains one of the main obstacles to economic and human development in Africa. For example, across Kenya, Rwanda, Tanzania, and Uganda only 9.1 million adults (or 14% of adults) have access to or use a commercial bank account. The objective of this app that embeds a machine learning model is to predict which individuals are most likely to have or use a bank account.")
 
 # Main page
 
@@ -87,14 +88,29 @@ st.sidebar.write(
 form = st.form(key="information", clear_on_submit=True)
 with form:
 
-    cols = st.columns((1, 1))
+    cols = st.columns((1, 1, 1))
+    cols_002 = st.columns((1, 1,))
     # petal_length = cols[0].slider("What's the petal length?: ", 0.0, 10.0, 1.0)
 
+    # df_input = pd.DataFrame(
+    #     {"petal length (cm)": [cols[0].slider("What's the petal length? :", 0.0, 10.0, 1.0)],
+    #      "petal width (cm)": [cols[1].slider("What's the petal width? :", 0.0, 10.0, 1.0)],
+    #      "sepal length (cm)": [cols[0].slider("What's the sepal length? :", 0.0, 10.0, 1.0)],
+    #      "sepal width (cm)": [cols[1].slider("What's the sepal width? :", 0.0, 10.0, 1.0)], }
+    # )
     df_input = pd.DataFrame(
-        {"petal length (cm)": [cols[0].slider("What's the petal length? :", 0.0, 10.0, 1.0)],
-         "petal width (cm)": [cols[1].slider("What's the petal width? :", 0.0, 10.0, 1.0)],
-         "sepal length (cm)": [cols[0].slider("What's the sepal length? :", 0.0, 10.0, 1.0)],
-         "sepal width (cm)": [cols[1].slider("What's the sepal width? :", 0.0, 10.0, 1.0)], }
+        {'household_size': [cols[0].slider(label="Select the household size", min_value=1, max_value=40, value=3, step=1)],
+         'year': [cols[1].slider(label="Select the year", min_value=2016, max_value=2018, value=2016, step=1)],
+         'age_of_respondent': [cols[2].slider(label="Select the respondent age", min_value=0, max_value=120, value=30, step=1)],
+         'job_type': [cols_002[1].selectbox('Select the job type', col_to_opts['job_type'])],
+         'location_type': [cols[1].selectbox('Select the location type', col_to_opts['location_type'])],
+         'gender_of_respondent': [cols[2].selectbox('Select the respondent gender', col_to_opts['gender_of_respondent'])],
+         'relationship_with_head': [cols[0].selectbox('Select the relationship with head', col_to_opts['relationship_with_head'])],
+         'education_level': [cols[1].selectbox('Select the education level', col_to_opts['education_level'])],
+         'marital_status': [cols[2].selectbox('Select the marital status', col_to_opts['marital_status'])],
+         'cellphone_access': [cols_002[0].radio('Cellphone access ?', col_to_opts['cellphone_access'], horizontal=True)],
+         'country': [cols[0].selectbox('Select the country', col_to_opts['country'])]
+         }
     )
     print(
         f"\n[Info] Input information as dataframe: \n{df_input.to_markdown()}\n")
