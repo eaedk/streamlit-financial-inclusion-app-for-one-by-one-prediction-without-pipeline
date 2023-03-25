@@ -41,16 +41,16 @@ ss = pd.read_csv(os.path.join(SPECIFIC_DATASET_DIR, 'SampleSubmission.csv'))
 print(
     f"[Info] Dataset loaded : shape={train.shape}\n{train.head().to_markdown()}")
 
-df = train
 target_col = 'bank_account'
+
 # 1 indicates that the individual does have a bank account and 0 indicates that they do not.
 target_names = ["no_account", "has_account"]
 
-print("\n", df.info(), "\n",)
-print("\n", df.describe(), "\n",)
+print("\n", train.info(), "\n",)
+print("\n", train.describe(), "\n",)
 
 # pandas profiling
-profile = ProfileReport(df, title="Dataset", html={
+profile = ProfileReport(train, title="Dataset", html={
                         'style': {'full_width': True}})
 profile.to_file(eda_report_fp)
 
@@ -63,12 +63,13 @@ to_ignore_cols = [
 ]
 
 
-num_cols = list(set(df.select_dtypes('number')) - set(to_ignore_cols))
-cat_cols = list(set(df.select_dtypes(exclude='number')) - set(to_ignore_cols))
+num_cols = list(set(train.select_dtypes('number')) - set(to_ignore_cols))
+cat_cols = list(set(train.select_dtypes(
+    exclude='number')) - set(to_ignore_cols))
 print(f"\n[Info] The '{len(num_cols)}' numeric columns are : {num_cols}\nThe '{len(cat_cols)}' categorical columns are : {cat_cols}")
 
-X, y = df[num_cols+cat_cols], df[target_col].values
-
+X, y = train[num_cols+cat_cols], train[target_col].values
+X_test = test[num_cols+cat_cols]
 
 X_train, X_eval, y_train, y_eval = train_test_split(
     X, y, test_size=0.2, random_state=0, stratify=y)
@@ -89,14 +90,17 @@ cat_imputer = SimpleImputer(
 cat_ = 'auto'
 if len(cat_cols) > 0:
     df_imputed_stacked_cat = cat_imputer.fit_transform(
-        df
-        .append(df)
-        .append(df)
-        [cat_cols])
-    cat_ = OneHotEncoder(sparse=False, drop="first").fit(
+        pd.concat([train, test], axis=0)[cat_cols])
+
+    cat_ = OneHotEncoder(sparse_output=False, drop="first").fit(
         df_imputed_stacked_cat).categories_
 
-encoder = OneHotEncoder(categories=cat_, sparse=False,
+cat_n_uniques = {cat_cols[i]: opts_arr.tolist()
+                 for (i, opts_arr) in enumerate(cat_)}
+print(
+    f"\n[Info] All the available unique values in each category are : {cat_n_uniques}\n")
+
+encoder = OneHotEncoder(categories=cat_, sparse_output=False,
                         drop="first").set_output(transform="pandas")
 scaler = StandardScaler().set_output(transform="pandas")
 
@@ -138,8 +142,8 @@ y_eval_pred = model.predict(X_eval_ok)
 print(classification_report(y_eval, y_eval_pred,
       target_names=target_names))
 
-# ConfusionMatrixDisplay.from_predictions(
-#     y_eval, y_eval_pred, display_labels=target_names)
+ConfusionMatrixDisplay.from_predictions(
+    y_eval, y_eval_pred, display_labels=target_names)
 
 # Exportation
 print(
@@ -164,4 +168,5 @@ with open(ml_fp, 'wb') as file:
 # ! pip freeze > requirements.txt
 call(f"pip freeze > {req_fp}", shell=True)
 
-print(f"[Info] Dictionary to use to as base for dataframe filling :\n",{col: [] for col in X_train.columns})
+print(f"[Info] Dictionary to use to as base for dataframe filling :\n", {
+      col: [] for col in X_train.columns})
